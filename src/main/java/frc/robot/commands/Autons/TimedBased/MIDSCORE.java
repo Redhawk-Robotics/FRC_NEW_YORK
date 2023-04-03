@@ -1,0 +1,60 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands.Autons.TimedBased;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.Positions.stowAway;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.ExtenderSubsystem;
+import frc.robot.subsystems.WristSubsystem;
+
+// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
+// information, see:
+// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+public class MIDSCORE extends SequentialCommandGroup {
+  /** Creates a new MIDSCORE. */
+  private ExtenderSubsystem extender = new ExtenderSubsystem();
+  private ArmSubsystem arm = new ArmSubsystem();
+  private WristSubsystem wrist = new WristSubsystem();
+  private ClawSubsystem claw = new ClawSubsystem();
+
+  public MIDSCORE() {
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
+    addCommands(
+        // new ClawCMD(claw, true),
+        // CLOSE
+        new InstantCommand(() -> claw.closeClaw()),
+        // SAFETY UP
+        new ParallelCommandGroup(
+          new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> wrist.setPosition(5))),
+        // MOVE ARM
+        new InstantCommand(() -> arm.setPosition(43)),
+        // MOVE WRIST
+        new ParallelCommandGroup(
+          new InstantCommand(() -> wrist.setPosition(28)),
+          new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> arm.setPosition(43))),
+
+        new WaitCommand(.3),
+        // OPEN CLAW
+        new ParallelCommandGroup(
+            new InstantCommand(() -> claw.openClaw()),
+            new InstantCommand(() -> arm.setPosition(43))),
+
+        new WaitCommand(.3),
+        // SAFETY
+        new InstantCommand(() -> wrist.setPosition(0)),
+        // WE DIP
+        new stowAway()
+        );
+  }
+}
+
