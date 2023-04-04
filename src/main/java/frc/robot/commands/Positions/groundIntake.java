@@ -17,11 +17,8 @@ import frc.robot.subsystems.WristSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class groundIntake extends SequentialCommandGroup {
   /** Creates a new groundIntake. */
-  private ExtenderSubsystem extender;
-  private ArmSubsystem arm;
-  private WristSubsystem wrist;
 
-  public groundIntake() {
+  public groundIntake(ExtenderSubsystem extender, ArmSubsystem arm, WristSubsystem wrist) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

@@ -16,20 +16,17 @@ import frc.robot.subsystems.WristSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class stowAway extends SequentialCommandGroup {
   /** Creates a new stowAway. */
-  private ExtenderSubsystem extender;
-  private ArmSubsystem arm;
-  private WristSubsystem wrist;
-  
-  public stowAway() {
+
+  public stowAway(ExtenderSubsystem extender, ArmSubsystem arm, WristSubsystem wrist) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ParallelCommandGroup(
-                        new InstantCommand(() -> extender.setPosition(0)),
-                        new InstantCommand(() -> wrist.setPosition(5))),
-                new ParallelCommandGroup(
-                        new InstantCommand(() -> arm.setPosition(0)),
-                        new InstantCommand(() -> wrist.setPosition(5)),
-                        new InstantCommand(() -> extender.setPosition(0))));
+        new ParallelCommandGroup(
+            new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> wrist.setPosition(5))),
+        new ParallelCommandGroup(
+            new InstantCommand(() -> arm.setPosition(0)),
+            new InstantCommand(() -> wrist.setPosition(5)),
+            new InstantCommand(() -> extender.setPosition(0))));
   }
 }

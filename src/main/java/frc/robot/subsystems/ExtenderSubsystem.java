@@ -27,6 +27,8 @@ public class ExtenderSubsystem extends SubsystemBase {
 
   public ExtenderSubsystem() {
     extenderMotor = new CANSparkMax(Ports.Extender.extender, MotorType.kBrushless);
+    extenderMotor.setIdleMode(IdleMode.kCoast);
+    extenderMotor.setInverted(true);
     extenderEncoder = extenderMotor.getEncoder();
 
     extenderController = extenderMotor.getPIDController();
@@ -35,8 +37,9 @@ public class ExtenderSubsystem extends SubsystemBase {
     extenderMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     extenderMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    extenderMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 0);// TODO check the value for both forward and
-                                                                           // reverse
+    extenderMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 270);// TODO check the value for both forward
+                                                                             // and
+    // reverse
     extenderMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0);
 
     setSmartMotionParams();

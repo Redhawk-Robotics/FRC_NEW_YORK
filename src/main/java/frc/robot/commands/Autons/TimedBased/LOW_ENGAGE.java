@@ -14,9 +14,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class LOW_ENGAGE extends SequentialCommandGroup {
   /** Creates a new LOW_ENGAGE. */
-  private final SwerveSubsystem SwerveDrive = new SwerveSubsystem();
 
-  public LOW_ENGAGE() {
+  public LOW_ENGAGE(SwerveSubsystem SwerveDrive) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

@@ -25,8 +25,8 @@ public class WristSubsystem extends SubsystemBase {
 
   private final SparkMaxPIDController wristAngleController;
 
-  private double wristSpeed = 0.3;//FIXME tune later 
-  private double wristSpeedReverse = -0.3;//FIXME tune later
+  private double wristSpeed = 0.3;// FIXME tune later
+  private double wristSpeedReverse = -0.3;// FIXME tune later
 
   private double stop = 0;
 
@@ -38,16 +38,20 @@ public class WristSubsystem extends SubsystemBase {
 
     configWristMotor(wristMotor, wristEncoder, wristAngleController, Ports.Wrist.wristMotorInvert);
 
-    wristMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
-    wristMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+    wristMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward,
+        true);
+    wristMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse,
+        true);
 
-    wristMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 0);//mayb using float to get a more precise number
-    wristMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0);
+    wristMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,
+        5);
 
+    wristMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse,
+        -30);
     setSmartMotionParams();
     PID();
 
-    ///resetEncoder();
+    /// resetEncoder();
     // enableMotors(true);
   }
 
@@ -56,13 +60,18 @@ public class WristSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Wrist Encoder Value", wristEncoder.getPosition());
   }
+
   private void setSmartMotionParams() {
-    wristAngleController.setSmartMotionMaxVelocity(Settings.wristSetting.SmartMotionParameters.maxVel, Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
-    wristAngleController.setSmartMotionMinOutputVelocity(Settings.wristSetting.SmartMotionParameters.minVel, Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
-    wristAngleController.setSmartMotionMaxAccel(Settings.wristSetting.SmartMotionParameters.maxAccel,Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
-    wristAngleController.setSmartMotionAllowedClosedLoopError(Settings.wristSetting.SmartMotionParameters.maxErr, Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
+    wristAngleController.setSmartMotionMaxVelocity(Settings.wristSetting.SmartMotionParameters.maxVel,
+        Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
+    wristAngleController.setSmartMotionMinOutputVelocity(Settings.wristSetting.SmartMotionParameters.minVel,
+        Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
+    wristAngleController.setSmartMotionMaxAccel(Settings.wristSetting.SmartMotionParameters.maxAccel,
+        Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
+    wristAngleController.setSmartMotionAllowedClosedLoopError(Settings.wristSetting.SmartMotionParameters.maxErr,
+        Settings.wristSetting.SmartMotionParameters.smartMotionSlot);
   }
-  
+
   // Methods for config for the motors used in this subsystems
   private void configWristMotor(CANSparkMax wristMotor, RelativeEncoder wristEncoder,
       SparkMaxPIDController wristAngleController, boolean Invert) {
@@ -78,7 +87,7 @@ public class WristSubsystem extends SubsystemBase {
     Timer.delay(1);
   }
 
-  private void PID(){
+  private void PID() {
     wristAngleController.setP(Settings.wristSetting.wristP);
     wristAngleController.setI(Settings.wristSetting.wristI);
     wristAngleController.setD(Settings.wristSetting.wristD);
@@ -93,10 +102,11 @@ public class WristSubsystem extends SubsystemBase {
     wristAngleController.setReference(targetPosition, CANSparkMax.ControlType.kSmartMotion);
   }
 
-  //Getters
- public double getCurrentPosition() {
+  // Getters
+  public double getCurrentPosition() {
     return wristEncoder.getPosition();
   }
+
   public void setMotor(double speed) {
     wristMotor.set(speed);
   }

@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -36,10 +39,10 @@ public class SwerveSubsystem extends SubsystemBase {
   private PigeonModule m_Pigeon;
   private Field2d field;
 
-  // private SwerveModule frontLeftModule0;
-  // private SwerveModule frontRightModule1;
-  // private SwerveModule backLeftModule2;
-  // private SwerveModule backRightModule3;
+  private SwerveModule frontLeftModule0;
+  private SwerveModule frontRightModule1;
+  private SwerveModule backLeftModule2;
+  private SwerveModule backRightModule3;
 
   public SwerveSubsystem() {
     // By default we use a Pigeon for our gyroscope. But if you use another
@@ -78,6 +81,9 @@ public class SwerveSubsystem extends SubsystemBase {
     // Creating and putting the field for Charged Up onto to the SmartDashboard
     field = new Field2d();
     SmartDashboard.putData("Field", field);
+
+    // private SwerveAutoBuilder base = new SwerveAutoBuilder(new Translation2d(),
+    // );
 
   }
 
@@ -183,7 +189,7 @@ public class SwerveSubsystem extends SubsystemBase {
   // Rotation2d.fromDegrees(0)));
   // }
 
-  // ResSettings the Pigeon Gyroscope in order for feild centric driving
+  // Ressetting the Pigeon Gyroscope in order for feild centric driving
   public void zeroGyro() {
     m_Pigeon.setYaw(0.0);
     System.out.println("Feild Centric Activate :)))");
@@ -210,11 +216,11 @@ public class SwerveSubsystem extends SubsystemBase {
     // Updates the SwerveDrive odometry of its heading and the positon
     swerveOdometry.update(getYaw(), getPositions());
 
-    // ResSettings the robot position of the SwerveDrive on the feild
+    // Ressetting the robot position of the SwerveDrive on the feild
     field.setRobotPose(getPose());
 
     // To get values for the SwerveDrive modules in SmartDashboard
-    // for (SwerveModule mod : SwerveMods) {
+    for (SwerveModule mod : SwerveMods) {
       // TODO if need some values for later
       // SmartDashboard.putNumber(
       // "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -225,7 +231,7 @@ public class SwerveSubsystem extends SubsystemBase {
       // "Mod " + mod.moduleNumber + " Velocity",
       // mod.getState().speedMetersPerSecond);
     }
-  // }
+  }
 
   public Command followTraj(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
@@ -239,9 +245,9 @@ public class SwerveSubsystem extends SubsystemBase {
             traj,
             this::getPose,
             Settings.mKinematics,
-            new PIDController(Settings.AutoConstants.kPXController, 0, 0),//x
-            new PIDController(Settings.AutoConstants.kPYController, 0, 0),//y
-            new PIDController(Settings.AutoConstants.kPThetaController, 0, 0),//rotation
+            new PIDController(Settings.AutoConstants.kPXController, 0, 0), // x
+            new PIDController(Settings.AutoConstants.kPYController, 0, 0), // y
+            new PIDController(Settings.AutoConstants.kPThetaController, 0, 0), // rotation
             this::setModuleStates,
             true,
             this));

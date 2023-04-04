@@ -14,9 +14,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class CONE_MOBILITY extends SequentialCommandGroup {
   /** Creates a new CONE_MOBILITY. */
-  private final SwerveSubsystem SwerveDrive = new SwerveSubsystem();
 
-  public CONE_MOBILITY() {
+  public CONE_MOBILITY(SwerveSubsystem SwerveDrive) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

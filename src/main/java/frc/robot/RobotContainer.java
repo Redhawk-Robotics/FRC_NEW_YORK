@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -152,13 +155,13 @@ public class RobotContainer {
     arm.setDefaultCommand(
         new ArmManual(
             arm,
-            () -> OPERATOR.getRawAxis(leftYAxis2)));
+            () -> -OPERATOR.getRawAxis(leftYAxis2)));
 
     // extederTest//
     extender.setDefaultCommand(
         new ExtenderManual(
             extender,
-            () -> OPERATOR.getRawAxis(rightYAxis2)));
+            () -> -OPERATOR.getRawAxis(rightYAxis2)));
 
     // Configure the trigger bindings, defaults, Autons
     configureDefaultCommands();
@@ -191,36 +194,17 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // Driver Controls
-    // ------------------------------------- GYRO
-    driver_A_zeroGyro.onTrue(new InstantCommand(() -> SwerveDrive.zeroGyro()));
+    // opperator_B.onTrue(new stowAway(extender, arm, wrist));
+    opperator_B.onTrue(substationCommand());
+    opperator_Y.onTrue(new Substation(extender, arm, wrist));
+    opperator_X.onTrue(new groundIntake(extender, arm, wrist));
 
-    // Operator Controls
-    opperator_Y.onTrue(new Substation());
-    opperator_A.onTrue(new stowAway());
-    opperator_X.onTrue(new groundIntake());
-    // opperator_B.onTrue(new );
-
-    // ------------------------------------- ARM
-    opperator_leftBumper.onTrue(new InstantCommand(() -> arm.setPosition(44)));
-
-    opperator_leftBumper.whileFalse(new InstantCommand(() -> arm.stopArm()));
-    // ------------------------------------- CLAW
-    opperator_BottomLeftRearButton.onTrue(new InstantCommand(() -> claw.coneIntake()));
-    opperator_TopLeftRearButton.onTrue(new InstantCommand(() -> claw.cubeIntake()));
-
-    opperator_BottomLeftRearButton.whileFalse(new InstantCommand(() -> claw.stopClaw()));
-    opperator_TopLeftRearButton.whileFalse(new InstantCommand(() -> claw.stopClaw()));
-
-    opperator_RightBumper.onTrue(new InstantCommand(() -> claw.outTake()));
-
-    // ------------------------------------- WRIST
+    // // ------------------------------------- WRIST
     opperator_TopRightRearButton.onTrue(new InstantCommand(() -> wrist.upGoWrist()));
     opperator_TopRightRearButton.onFalse(new InstantCommand(() -> wrist.stopWrist()));
 
     opperator_BottomRightRearButton.onTrue(new InstantCommand(() -> wrist.downGoWrist()));
     opperator_BottomRightRearButton.onFalse(new InstantCommand(() -> wrist.stopWrist()));
-    // ------------------------------------- EXTENDER
 
   }
 
@@ -231,14 +215,15 @@ public class RobotContainer {
     SmartDashboard.putData("Autonomous: ", Autons);
 
     Autons.setDefaultOption("Do Nothing", new DoNothingAuton());
-    Autons.addOption(" CONE_MOBILITYv", new CONE_MOBILITY());
+    Autons.addOption(" CONE_MOBILITY", new CONE_MOBILITY(SwerveDrive));
 
-    Autons.addOption("CONE_MOBILITY_PICKUP", new CONE_MOBILITY_PICKUP());
+    Autons.addOption("CONE_MOBILITY_PICKUP", new CONE_MOBILITY_PICKUP(SwerveDrive, claw,
+        new groundIntake(extender, arm, wrist), new stowAway(extender, arm, wrist)));
 
-    Autons.addOption("JUST_CHARGE_PAD", new JUST_CHARGE_PAD());
-    Autons.addOption("LOW_ENGAGE", new LOW_ENGAGE());
+    Autons.addOption("JUST_CHARGE_PAD", new JUST_CHARGE_PAD(SwerveDrive));
+    Autons.addOption("LOW_ENGAGE", new LOW_ENGAGE(SwerveDrive));
 
-    Autons.addOption("MIDSCORE", new MIDSCORE());
+    Autons.addOption("MIDSCORE", new MIDSCORE(extender, arm, wrist, claw, new stowAway(extender, arm, wrist)));
   }
 
   /**
@@ -250,4 +235,41 @@ public class RobotContainer {
     // An example command will be run in autonomous
     return Autons.getSelected();
   }
+
+  public Command substationCommand() {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> extender.setPosition(0)),
+        new InstantCommand(() -> arm.setPosition(44)),
+        new InstantCommand(() -> wrist.setPosition(-5)),
+        new WaitCommand(1),
+        new ParallelCommandGroup(
+            new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> wrist.setPosition(-32)),
+            new InstantCommand(() -> arm.setPosition(44))));
+
+  }
+
+  // public Command stoweAway() {
+  // return new SequentialCommandGroup(
+  // new ParallelCommandGroup(
+  // new InstantCommand(() -> extender.setPosition(0)),
+  // new InstantCommand(() -> wrist.setPosition(5))),
+  // new ParallelCommandGroup(
+  // new InstantCommand(() -> arm.setPosition(0)),
+  // new InstantCommand(() -> wrist.setPosition(5)),
+  // new InstantCommand(() -> extender.setPosition(0))));
+  // }
+
+  // public Command groundCommand() {
+  // return new SequentialCommandGroup(
+  // new ParallelCommandGroup(
+  // new InstantCommand(() -> extender.setPosition(0)),
+  // new InstantCommand(() -> wrist.setPosition(5))),
+  // new WaitCommand(1.5),
+  // new InstantCommand(() -> arm.setPosition(11)),
+  // // new InstantCommand(() -> claw.coneIntake()),
+  // new ParallelCommandGroup(
+  // new InstantCommand(() -> extender.setPosition(0)),
+  // new InstantCommand(() -> wrist.setPosition(-32))));
+  // }
 }

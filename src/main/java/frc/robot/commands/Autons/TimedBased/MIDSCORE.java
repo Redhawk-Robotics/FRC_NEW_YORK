@@ -4,11 +4,13 @@
 
 package frc.robot.commands.Autons.TimedBased;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Positions.stowAway;
+import frc.robot.constants.Ports.Wrist;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ExtenderSubsystem;
@@ -19,12 +21,9 @@ import frc.robot.subsystems.WristSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class MIDSCORE extends SequentialCommandGroup {
   /** Creates a new MIDSCORE. */
-  private ExtenderSubsystem extender = new ExtenderSubsystem();
-  private ArmSubsystem arm = new ArmSubsystem();
-  private WristSubsystem wrist = new WristSubsystem();
-  private ClawSubsystem claw = new ClawSubsystem();
 
-  public MIDSCORE() {
+  public MIDSCORE(ExtenderSubsystem extender, ArmSubsystem arm, WristSubsystem wrist, ClawSubsystem claw,
+      Command stowAway) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -33,14 +32,14 @@ public class MIDSCORE extends SequentialCommandGroup {
         new InstantCommand(() -> claw.closeClaw()),
         // SAFETY UP
         new ParallelCommandGroup(
-          new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> extender.setPosition(0)),
             new InstantCommand(() -> wrist.setPosition(5))),
         // MOVE ARM
         new InstantCommand(() -> arm.setPosition(43)),
         // MOVE WRIST
         new ParallelCommandGroup(
-          new InstantCommand(() -> wrist.setPosition(28)),
-          new InstantCommand(() -> extender.setPosition(0)),
+            new InstantCommand(() -> wrist.setPosition(28)),
+            new InstantCommand(() -> extender.setPosition(0)),
             new InstantCommand(() -> arm.setPosition(43))),
 
         new WaitCommand(.3),
@@ -53,8 +52,6 @@ public class MIDSCORE extends SequentialCommandGroup {
         // SAFETY
         new InstantCommand(() -> wrist.setPosition(0)),
         // WE DIP
-        new stowAway()
-        );
+        stowAway);
   }
 }
-

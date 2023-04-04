@@ -31,25 +31,27 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem() {
 
     leftArmMotor = new CANSparkMax(Ports.Arm.leftArm, MotorType.kBrushless);
+    leftArmMotor.setInverted(true);
+    leftArmMotor.setIdleMode(IdleMode.kCoast);
     leftArmEncoder = leftArmMotor.getEncoder();
 
     rightArmMotor = new CANSparkMax(Ports.Arm.rightArm, MotorType.kBrushless);
     rightArmEncoder = rightArmMotor.getEncoder();
 
-    leftArmMotor.follow(rightArmMotor, true); 
+    leftArmMotor.follow(rightArmMotor, true);
 
     armAngleController = rightArmMotor.getPIDController();
-    
+
     configArmMotor(rightArmMotor, rightArmEncoder, armAngleController, Ports.Arm.rightArmMotorInvert);
 
     rightArmMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     rightArmMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    rightArmMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 0);// TODO check the value for both forward and
-                                                                           // reverse
-    rightArmMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0);
-    
-    //resetEncoder();
+    rightArmMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 44);// TODO check the value for both forward and
+                                                                            // reverse
+    rightArmMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -2);
+    pid();
+    // resetEncoder();
 
     // enableMotors(true);//TODO test later
   }
@@ -57,7 +59,8 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("RightArm Encoder Value", leftArmEncoder.getPosition());
+    SmartDashboard.putNumber("LeftArm Encoder Value", leftArmEncoder.getPosition());
+    SmartDashboard.putNumber("RightArm Encoder Value", rightArmEncoder.getPosition());
 
   }
 
@@ -76,43 +79,27 @@ public class ArmSubsystem extends SubsystemBase {
     Timer.delay(1);
     // resetToAbsolute();//FIXME if we are adding a canCODER to the shaft of the arm
   }
-  private void pidUp(){
+
+  private void pid() {
     armAngleController.setP(Settings.armSetting.armPup);
     armAngleController.setI(Settings.armSetting.armIup);
     armAngleController.setD(Settings.armSetting.armDup);
     armAngleController.setFF(Settings.armSetting.armFFup);
   }
 
-  private void pidDown(){
-    armAngleController.setP(Settings.armSetting.armPdown);
-    armAngleController.setI(Settings.armSetting.armIdown);
-    armAngleController.setD(Settings.armSetting.armDdown);
-    armAngleController.setFF(Settings.armSetting.armFFdown);
-  }
-  
-  private void manageMotion(double targetPosition) {
-    double currentPosition = getCurrentPosition();
-      if (currentPosition < targetPosition) {
-        pidUp();
-      } else {
-        pidDown();
-      }
-  }
-
   public void setPosition(double targetPosition) {
-    manageMotion(targetPosition);
     armAngleController.setReference(targetPosition, CANSparkMax.ControlType.kPosition);
   }
 
   public void setSmartMotionPosition(double targetPosition) {
-    manageMotion(targetPosition);
     armAngleController.setReference(targetPosition, CANSparkMax.ControlType.kSmartMotion);
   }
 
-  //Getters
- public double getCurrentPosition() {
+  // Getters
+  public double getCurrentPosition() {
     return rightArmEncoder.getPosition();
   }
+
   public void setMotor(double speed) {
     rightArmMotor.set(speed);
   }
@@ -125,14 +112,15 @@ public class ArmSubsystem extends SubsystemBase {
     return rightArmMotor.getOutputCurrent();
   }
 
-public void stopArm(){
-  rightArmMotor.set(stop);
-  leftArmMotor.set(stop);
-}
+  public void stopArm() {
+    rightArmMotor.set(stop);
+    leftArmMotor.set(stop);
+  }
+
   // TODO try with the wrist that if its in code that its coast, and moves freely,
   // then this method is not needed
   public void enableMotors(boolean on) {
-    IdleMode mode = on ? IdleMode.kBrake: IdleMode.kCoast;
+    IdleMode mode = on ? IdleMode.kBrake : IdleMode.kCoast;
 
     leftArmMotor.setIdleMode(mode);
     rightArmMotor.setIdleMode(mode);

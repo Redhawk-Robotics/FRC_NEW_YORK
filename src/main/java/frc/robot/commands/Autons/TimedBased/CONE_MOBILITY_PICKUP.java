@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Autons.TimedBased;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,10 +20,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class CONE_MOBILITY_PICKUP extends SequentialCommandGroup {
   /** Creates a new CONE_MOBILITY_PICKUP. */
-  private final SwerveSubsystem SwerveDrive = new SwerveSubsystem();
-  private final ClawSubsystem claw = new ClawSubsystem();
 
-  public CONE_MOBILITY_PICKUP() {
+  public CONE_MOBILITY_PICKUP(SwerveSubsystem SwerveDrive, ClawSubsystem claw, Command groundIntake, Command stowAway) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -30,8 +29,8 @@ public class CONE_MOBILITY_PICKUP extends SequentialCommandGroup {
         new WaitCommand(1),
         new ParallelDeadlineGroup(
             new DriveForward(SwerveDrive, 4, 15, 7),
-            new groundIntake()),
+            groundIntake),
         new InstantCommand(() -> claw.stopClaw()),
-        new stowAway());
+        stowAway);
   }
 }

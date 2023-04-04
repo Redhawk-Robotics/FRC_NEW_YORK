@@ -27,45 +27,47 @@ public class ClawSubsystem extends SubsystemBase {
   /** Creates a new ClawSubsystem. */
   private final CANSparkMax leftNeo550, rightNeo550;
   private final RelativeEncoder leftEncoder, rightEncoder;
-  
-  private final SparkMaxPIDController clawSpeedPIDController; 
+
+  private final SparkMaxPIDController clawSpeedPIDController;
 
   private final DoubleSolenoid clawSolenoid;
 
   public ClawSubsystem() {
-    leftNeo550 = new CANSparkMax(Ports.Claw.leftClawMotor, MotorType.kBrushless);
-    rightNeo550 = new CANSparkMax(Ports.Claw.rightClawMotor, MotorType.kBrushless);
+    leftNeo550 = new CANSparkMax(Ports.Claw.leftClaw, MotorType.kBrushless);
+    rightNeo550 = new CANSparkMax(Ports.Claw.rightClaw, MotorType.kBrushless);
 
-    clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH,  Ports.Claw.clawPneumatic.clawForwardChannel, Ports.Claw.clawPneumatic.clawReverseChannel);//FIXME to fix pneumatics
-    
+    clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Ports.Claw.clawPneumatic.clawForwardChannel,
+        Ports.Claw.clawPneumatic.clawReverseChannel);// FIXME to fix pneumatics
+
     leftEncoder = leftNeo550.getEncoder();
     rightEncoder = rightNeo550.getEncoder();
 
-    leftNeo550.follow(rightNeo550,false);
-    
+    leftNeo550.follow(rightNeo550, false);
+
     clawSpeedPIDController = leftNeo550.getPIDController();
-    
+
     configClawMotor(leftNeo550, leftEncoder, clawSpeedPIDController, Ports.Claw.leftClawMotorInvert);
 
     PID();
-    //enableMotors(true);//TODO test later
+    // enableMotors(true);//TODO test later
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
-  public void enableMotors(boolean on){
+
+  public void enableMotors(boolean on) {
     IdleMode mode;
-    if(on){
+    if (on) {
       mode = IdleMode.kBrake;
-    }else{
+    } else {
       mode = IdleMode.kCoast;
     }
     leftNeo550.setIdleMode(mode);
     rightNeo550.setIdleMode(mode);
   }
-  
+
   public void coneIntake() {
     clawSolenoid.set(Value.kForward);
     leftNeo550.set(-.5);
@@ -87,15 +89,17 @@ public class ClawSubsystem extends SubsystemBase {
   public void stopClaw() {
     clawSolenoid.set(Value.kOff);
   }
-  public void openClaw(){
+
+  public void openClaw() {
     clawSolenoid.set(Value.kForward);
   }
 
-  public void closeClaw(){
+  public void closeClaw() {
     clawSolenoid.set(Value.kReverse);
   }
 
-  public void configClawMotor(CANSparkMax clawMotor, RelativeEncoder clawEncoder, SparkMaxPIDController clawController, boolean invert) {
+  public void configClawMotor(CANSparkMax clawMotor, RelativeEncoder clawEncoder, SparkMaxPIDController clawController,
+      boolean invert) {
     clawMotor.restoreFactoryDefaults();
     clawMotor.clearFaults();
     CANSparkMaxUtil.setCANSparkMaxBusUsage(clawMotor, Usage.kAll);
@@ -109,7 +113,7 @@ public class ClawSubsystem extends SubsystemBase {
     clawMotor.burnFlash();
   }
 
-  private void PID(){
+  private void PID() {
     clawSpeedPIDController.setP(Settings.clawSetting.clawP);
     clawSpeedPIDController.setI(Settings.clawSetting.clawI);
     clawSpeedPIDController.setD(Settings.clawSetting.clawD);

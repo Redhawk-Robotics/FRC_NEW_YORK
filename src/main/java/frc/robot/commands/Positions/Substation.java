@@ -7,6 +7,7 @@ package frc.robot.commands.Positions;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.constants.Ports.Wrist;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ExtenderSubsystem;
 import frc.robot.subsystems.WristSubsystem;
@@ -16,11 +17,8 @@ import frc.robot.subsystems.WristSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class Substation extends SequentialCommandGroup {
   /** Creates a new Substation. */
-  private ExtenderSubsystem extender;
-  private ArmSubsystem arm;
-  private WristSubsystem wrist;
 
-  public Substation() {
+  public Substation(ExtenderSubsystem extender, ArmSubsystem arm, WristSubsystem wrist) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
